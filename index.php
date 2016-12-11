@@ -1,12 +1,10 @@
 <?php
 ini_set("display_errors", true);
 	
-
 	$servername = "localhost";
 	$username = "root";
 	$password = "password";
 	$dbname = "foodbot";
-
 	// Create connection
 	$conn = mysqli_connect($servername, $username, $password);
 	// Check connection
@@ -14,13 +12,10 @@ ini_set("display_errors", true);
 	    die("Connection failed: " . mysqli_connect_error());
 	}
 	//echo "Connected successfully";
-
 	$db = mysqli_select_db($conn,$dbname);
 	if (!$db) {
 	    die ('Can\'t use foo : ' . mysqli_error());
 	}
-
-
 	$access_token = "EAAKesNV6Od0BALSZB0E1oTWi0u4rRP2XLEZAnPyddFAqqoiZCkK8bZC14C4btuDqgwmwFGZBGHE7rTYkQCSTGxi2CMpHZCeiofJlFYjErbcCczlRg6TYmYwEN1Dh3xEbazGtXNZB8G8ZAYdvMmlbgFmJiZBG7wzPLxoXSHBjv9ZCVapwZDZD";
 	$lat = '';
 	$long = '';
@@ -33,17 +28,12 @@ ini_set("display_errors", true);
 	if ($hub_verify_token === $verify_token) {
 	  echo $challenge;
 	}
-
-
 	$input = json_decode(file_get_contents("php://input"), true);
 	$sender = $input['entry'][0]['messaging'][0]['sender']['id'];
-
 	$message = $input['entry'][0]['messaging'][0]['message']['text'];
 	
-
 /*
 	function send_message($msg, $token){
-
 			echo $msg;
 			//API Url
 			$url = 'https://graph.facebook.com/v2.6/me/messages?access_token='.$token;
@@ -71,14 +61,12 @@ ini_set("display_errors", true);
 			if(!empty($input['entry'][0]['messaging'][0]['message'])){
 			 	$result = curl_exec($ch);
 			}
-
 	}
 */
 	
 	if($message == ""){
 		$coordinates = $input['entry'][0]['messaging'][0]['message']['attachments'][0]['payload']['coordinates'];
 		if($coordinates == NULL){
-
 		}
 		else{
 		
@@ -87,9 +75,7 @@ ini_set("display_errors", true);
 	
 			 
 			
-
 			if($lat != NULL){
-
 				$sql = "INSERT INTO coords ( lat, long) VALUES ( '".$lat."', '".$long."' )";
                 
                 $a = mysqli_query( $conn, $sql );
@@ -107,9 +93,7 @@ ini_set("display_errors", true);
 				                      {"content_type":"text", "title":"Cafe", "payload":"hello"}, 
 				                      {"content_type":"text", "title":"Continental", "payload":"hello"} 
 				                      ]}}';
-
 				 // print_r($jsonData);
-
 				// //Encode the array into JSON.
 				 $jsonDataEncoded = $jsonData;
 				// //Tell cURL that we want to send a POST request.
@@ -121,11 +105,9 @@ ini_set("display_errors", true);
 				// //Execute the request
 			 	$result = curl_exec($ch);
 			}
-
 		}
 	}
 	elseif(preg_match('[hello|hey|hi]', strtolower($message))){
-
 		
 		$msg = "Hey, Seems you are hungry. Please share your location so that we can suggest you the best restaurant around you. Thanks";
 		
@@ -136,7 +118,6 @@ ini_set("display_errors", true);
 		
 		// //The JSON data.
 		 $jsonData = '{ "recipient":{ "id":"'.$sender.'" }, "message":{ "text":"'.$msg.'", "quick_replies":[{"content_type":"location"}]}}';
-
 		// //Encode the array into JSON.
 		 $jsonDataEncoded = $jsonData;
 		// //Tell cURL that we want to send a POST request.
@@ -147,10 +128,8 @@ ini_set("display_errors", true);
 		 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 		// //Execute the request
 	 	$result = curl_exec($ch);
-
 	}
 	elseif((strpos($message, 'North Indian') !== false) || (strpos($message, 'Chinese') !== false) || (strpos($message, 'Cafe') !== false) || (strpos($message, 'Fast Food') !== false) || (strpos($message, 'Continental') !== false)){
-
 				$lat = 12.933145;
 				$lng = 77.611979;
 				$preference = ["".$message];
@@ -170,29 +149,18 @@ ini_set("display_errors", true);
 				//die();
 				//print_r($json['nearby_restaurants'][0]['restaurant']);
 				$msg = "Here we have awesome suggestions for you";
-				$jsonData = '{
+				
+							                
+			    $jsonData = '{
 							  "recipient":{
 							    "id":"'.$sender.'"
-							  }, "message": {
-							    "attachment": {
-							        "type": "template",
-							        "payload": {
-							            "template_type": "list",
-							            "elements": [
-							                {
-							                    "title": "Food",
-							                    "image_url": "https://b.zmtcdn.com/data/pictures/5/54165/7ce2f24fe5d8f455ff372a4f62a5643d_featured_v2.jpg",
-							                    "subtitle": "See all our colors",
-							                    "default_action": {
-							                        "type": "web_url",
-							                        "url": "https://b.zmtcdn.com/data/pictures/5/54165/7ce2f24fe5d8f455ff372a4f62a5643d_featured_v2.jpg",
-							                        "messenger_extensions": true,
-							                        "webview_height_ratio": "tall",
-							                        "fallback_url": "https://b.zmtcdn.com/data/pictures/5/54165/7ce2f24fe5d8f455ff372a4f62a5643d_featured_v2.jpg"
-							                    }
-							                },';
-							                
-							                
+							  },
+							  "message":{
+							    "attachment":{
+							      "type":"template",
+							      "payload":{
+							        "template_type":"generic",
+							        "elements":[';                
 							            
 				for ($i=0;$i<sizeof($json['nearby_restaurants']);$i++){
 					$cuisines =explode(',',$json['nearby_restaurants'][$i]['restaurant']['cuisines']);
@@ -201,62 +169,45 @@ ini_set("display_errors", true);
 						$name = $json['nearby_restaurants'][$i]['restaurant']['name'];
 						$url = $json['nearby_restaurants'][$i]['restaurant']['url'];
 						$featuredimg = $json['nearby_restaurants'][$i]['restaurant']['featured_image'];
-
 						// restaurant according to preference
 						
 						$jsonData .= '{
-							                    "title": "'.$name.'",
-							                    "image_url": "'.$featuredimg.'",
-							                    "subtitle": "100% Cotton, 200% Comfortable",
-							                    "default_action": {
-							                        "type": "web_url",
-							                        "url": "'.$url.'",
-							                        "messenger_extensions": true,
-							                        "webview_height_ratio": "tall",
-							                        "fallback_url": "'.$url.'"
-							                    },
-							                    "buttons": [
-							                        {
-							                            "title": "See More",
-							                            "type": "web_url",
-							                            "url": "'.$url.'",
-							                            "messenger_extensions": true,
-							                            "webview_height_ratio": "tall",
-							                            "fallback_url": "'.$url.'"                        
-							                        }
-							                    ]                
-							                },';
+							            "title":"'.$name.'",
+							            "item_url":"'.$url.'",
+							            "image_url":"'.$featuredimg.'",
+							            "subtitle":"Weve got the right hat for everyone.",
+							            "buttons":[
+							              {
+							                "type":"web_url",
+							                "url":"'.$url.'",
+							                "title":"View Website"
+							              },
+							              {
+							                "type":"postback",
+							                "title":"Start Chatting",
+							                "payload":"Hello"
+							              }              
+							            ]
+							          },';
+						
 					}
 				}
-
 				// Close request to clear up some resources
-				$jsonData .= '],
-							             "buttons": [
-							                {
-							                    "title": "View More",
-							                    "type": "postback",
-							                    "payload": "payload"                        
-							                }
-							            ]  
-							        }
-							    }
-							}
-							    
-						}';
-
-				curl_close($ch);
-
-
-
 				
+				curl_close($ch);
+				
+				$jsonData .= ']
+							      }
+							    }
+							  }}';
+
 		
-				$url = "https://graph.facebook.com/me/messages?access_token=".$access_token;
+				$url = "https://graph.facebook.com/v2.6/me/messages?access_token=".$access_token;
 					//Initiate cURL.
 					
 				$ch = curl_init($url);
 				
 				// //The JSON data.
-
 				// //Encode the array into JSON.
 				 $jsonDataEncoded = $jsonData;
 				// //Tell cURL that we want to send a POST request.
@@ -267,10 +218,6 @@ ini_set("display_errors", true);
 				 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 				// //Execute the request
 			 	$result = curl_exec($ch);
-
 	
-
 	}
-
-
  ?>
